@@ -215,8 +215,6 @@ npx hardhat run scripts/grant-minter-role.js --network localhost
 
 ## 📄 License
 
-MIT License - see LICENSE file for details.
+NPR License - see LICENSE file for details.
 
----
 
-**Need Help?** Check the troubleshooting section in individual component READMEs or open an issue.
