@@ -1,0 +1,21 @@
+{
+  "name": "certchain-eth",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "npx hardhat test",
+    "build": "npx hardhat compile",
+    "node": "npx hardhat node",
+    "deploy-local": "npx hardhat run --network localhost scripts/deploy.js"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.1.0",
+    "@openzeppelin/contracts": "^4.9.0",
+    "dotenv": "^16.0.3",
+    "ethers": "^5.7.2",
+    "hardhat": "^2.16.0"
+  },
+  "dependencies": {
+    "multer": "^1.4.5-lts.1"
+  }
+}

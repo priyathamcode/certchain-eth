@@ -1,0 +1,11 @@
+[
+  "function mintCertificate(address recipient) public returns (uint256)",
+  "function revokeCertificate(uint256 tokenId) public",
+  "function isValid(uint256 tokenId) public view returns (bool)",
+  "function grantMinterRole(address account) public",
+  "function revokeMinterRole(address account) public",
+  "function hasRole(bytes32 role, address account) public view returns (bool)",
+  "function ownerOf(uint256 tokenId) public view returns (address)",
+  "function MINTER_ROLE() public view returns (bytes32)",
+  "function DEFAULT_ADMIN_ROLE() public view returns (bytes32)"
+] 
