@@ -1,5 +1,5 @@
 [
-  "function mintCertificate(address recipient) public returns (uint256)",
+  "function mintCertificate(address recipient) public",
   "function revokeCertificate(uint256 tokenId) public",
   "function isValid(uint256 tokenId) public view returns (bool)",
   "function grantMinterRole(address account) public",

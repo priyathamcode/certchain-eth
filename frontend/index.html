@@ -3,10 +3,19 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>Certificate DApp — Frontend</title>
+    <title>CertChain — Certificates DApp</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="brand"><div class="logo"></div> CertChain</div>
+        <div class="nav-links">
+          <!-- Links are rendered by React Router -->
+        </div>
+      </div>
+    </div>
+    <div id="root" class="container"></div>
+    <footer class="footer small">© CertChain — Demo DApp</footer>
     <script type="module" src="/src/index.jsx"></script>
   </body>
 </html>

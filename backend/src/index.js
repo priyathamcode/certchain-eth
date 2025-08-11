@@ -1,14 +1,13 @@
-require('dotenv').config();
-const express = require('express');
-const bodyParser = require('body-parser');
-const { createClient } = require('./services/ipfs');
-const { getContracts } = require('./services/contract');
-const { generateSignedQR, verifySignature } = require('./services/signing');
+import 'dotenv/config';
+import express from 'express';
+import bodyParser from 'body-parser';
+import { createClient } from './services/ipfs.js';
+import { getContracts } from './services/contract.js';
+import { generateSignedQR, verifySignature } from './services/signing.js';
 
 const app = express();
 app.use(bodyParser.json());
 
-// CORS middleware
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
@@ -29,79 +28,73 @@ app.post('/api/upload', async (req, res) => {
   }
 });
 
-// Simplified verify endpoint for our current contract
 app.get('/api/verify/:tokenId', async (req, res) => {
   try {
     const { cert } = getContracts();
     const tokenId = req.params.tokenId;
     const valid = await cert.isValid(tokenId);
-    
-    res.json({ 
-      ok: true, 
-      tokenId: Number(tokenId),
-      valid: Boolean(valid),
-      timestamp: Math.floor(Date.now() / 1000)
-    });
+
+    res.json({ ok: true, tokenId: Number(tokenId), valid: Boolean(valid), timestamp: Math.floor(Date.now() / 1000) });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// Generate signed QR code
+// New: Issue/mint certificate via backend using minter wallet
+app.post('/api/issue', async (req, res) => {
+  try {
+    const { to } = req.body || {};
+    if (!to) {
+      return res.status(400).json({ error: 'Missing required field: to' });
+    }
+    const { cert } = getContracts();
+    const tx = await cert.mintCertificate(to);
+    const receipt = await tx.wait();
+    return res.json({ ok: true, txHash: tx.hash, blockNumber: receipt.blockNumber });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.post('/api/qr/generate', async (req, res) => {
   try {
     const { tokenId, metadata = {} } = req.body;
-    
     if (!tokenId) {
       return res.status(400).json({ error: 'tokenId is required' });
     }
 
-    // Check validity from contract
     const { cert } = getContracts();
     const valid = await cert.isValid(tokenId);
-    
-    // Generate signed QR
+
     const qrResult = await generateSignedQR(tokenId, valid, {
       name: metadata.name || 'Certificate',
       institution: metadata.institution || 'University',
       ...metadata
     });
-    
-    res.json({
-      ok: true,
-      ...qrResult
-    });
+
+    res.json({ ok: true, ...qrResult });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// Verify signed QR data
 app.post('/api/qr/verify', async (req, res) => {
   try {
     const { qrData } = req.body;
-    
     if (!qrData || !qrData.s || !qrData.t) {
       return res.status(400).json({ error: 'Invalid QR data format' });
     }
 
-    // Reconstruct payload
-    const payload = {
-      tokenId: qrData.t,
-      valid: qrData.valid,
-      timestamp: qrData.ts,
-      issuer: qrData.iss
-    };
+    const payload = { tokenId: qrData.t, valid: qrData.valid, timestamp: qrData.ts, issuer: qrData.iss };
 
-    // Verify signature
     const verification = verifySignature(payload, qrData.s);
-    
-    // Also check current blockchain state
+
     const { cert } = getContracts();
     const currentValid = await cert.isValid(qrData.t);
-    
+
     res.json({
       ok: true,
       signature: verification,
@@ -116,7 +109,6 @@ app.post('/api/qr/verify', async (req, res) => {
   }
 });
 
-// Health check
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, service: 'cert-backend', timestamp: Date.now() });
 });

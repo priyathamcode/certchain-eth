@@ -1,171 +1,164 @@
-# Certificate DApp with QR Signing
+# CertChain (Certificates DApp)
 
 A complete blockchain-based certificate management system with:
-- **Smart Contracts** (Solidity + Hardhat) 
-- **React Frontend** (ethers.js + MetaMask)
-- **Node.js Backend** (Express + QR signing)
+- Smart Contracts (Solidity + Hardhat)
+- React Frontend (Vite + ethers + MetaMask)
+- Node.js Backend (Express, ESM) for QR signing and IPFS upload
 
 ## 🏗️ Architecture
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   Frontend      │    │    Backend      │    │   Blockchain    │
-│   (React)       │◄──►│   (Express)     │◄──►│   (Hardhat)     │
+│   (React/Vite)  │◄──►│   (Express ESM) │◄──►│   (Hardhat)     │
 │                 │    │                 │    │                 │
-│ • Mint UI       │    │ • QR Signing    │    │ • CertificateNFT│
-│ • Verify UI     │    │ • IPFS Upload   │    │ • Verification  │
+│ • Mint/Verify   │    │ • QR Signing    │    │ • CertificateNFT│
+│ • Admin (IPFS)  │    │ • IPFS Upload   │    │ • Verification  │
 │ • MetaMask      │    │ • API Endpoints │    │ • AccessControl │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
-## 🚀 Quick Start
+## ✨ What’s new (recent updates)
+- Backend converted to ESM (type: module); consistent modern imports/exports
+- New POST /api/issue endpoint for server-side minting using minter wallet
+- Frontend UI/UX refresh: dark theme, cards, buttons, alerts, responsive layout
+- Routing hardened with default route and Admin page link
+- ABI and Solidity aligned for `mintCertificate(address)` with no return value
+- Tests updated to match current contracts and pass on localhost
+- Environment setup clarified; `.env` files for frontend and backend
 
-### 1. Start Local Blockchain
-```bash
+## 🔧 Prerequisites
+- Node.js 20.x (recommend 20.17+)
+- MetaMask browser extension
+- Git
+- Optional: IPFS daemon (or a remote IPFS API provider)
+
+## 📦 Install
+```powershell
+# from repo root
+npm install
+cd frontend; npm install; cd ..
+cd backend; npm install; cd ..
+```
+
+## 🚀 Local development
+1) Start local blockchain
+```powershell
 npx hardhat node
 ```
 
-### 2. Deploy Contracts
-```bash
+2) Deploy contracts to localhost
+```powershell
 npx hardhat run scripts/deploy.js --network localhost
 ```
-
-### 3. Grant Minter Roles
-```bash
-npx hardhat run scripts/grant-minter-role.js --network localhost
+Copy the CertificateNFT address that is printed. Example:
+```
+VITE_CONTRACT_ADDRESS=0x5FbDB2315678afecb367f032d93F642f64180aa3
 ```
 
-### 4. Start Backend (QR Signing)
-```bash
-cd backend && npm start
+3) Create environment files
+- `frontend/.env`
+```
+VITE_CONTRACT_ADDRESS=<CertificateNFT address from deploy>
+```
+- `backend/.env`
+```
+RPC_URL=http://127.0.0.1:8545
+PRIVATE_KEY=<Hardhat Account #0 private key>
+CERT_CONTRACT_ADDRESS=<CertificateNFT address>
+# Optional extras
+UNIVERSITY_PRIVATE_KEY=<Hardhat Account #1 private key>
+IPFS_URL=http://localhost:5001
 ```
 
-### 5. Start Frontend
-```bash
-cd frontend && npm run dev
+4) Start backend (Express, ESM)
+```powershell
+cd backend
+npm start
+# Backend listening on http://localhost:4000
 ```
 
-### 6. Configure MetaMask
-- **Network**: `http://127.0.0.1:8545`
-- **Chain ID**: `31337`
-- **Import Account**: `0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80`
-
-## 📋 Features
-
-### ✅ **Smart Contracts**
-- **CertificateNFT**: ERC721 with AccessControl
-  - `MINTER_ROLE` for universities
-  - `DEFAULT_ADMIN_ROLE` for admins
-  - Certificate validation & revocation
-  
-- **Verification**: Simple validation interface
-
-### ✅ **Frontend (React)**
-- **Mint Page**: Universities can mint certificates
-- **Verify Page**: Anyone can verify certificates
-- **QR Generation**: Create signed QR codes
-- **MetaMask Integration**: Wallet connection
-
-### ✅ **Backend (Express)**
-- **QR Signing**: Cryptographic signatures for QR codes
-- **IPFS Upload**: Metadata storage
-- **API Endpoints**: Contract interaction helpers
-
-## 🔧 Detailed Setup
-
-### Prerequisites
-- Node.js v20+
-- MetaMask browser extension
-- Git
-
-### Installation
-```bash
-# Clone repository
-git clone <your-repo>
-cd certchain-eth
-
-# Install dependencies
-npm install
-cd frontend && npm install
-cd ../backend && npm install
-cd ..
+5) Start frontend (Vite)
+```powershell
+cd frontend
+npm run dev
+# Open the printed http://localhost:5173 (or next available port)
 ```
 
-### Environment Setup
-Create `frontend/.env`:
+6) Configure MetaMask (localhost)
+- RPC URL: http://127.0.0.1:8545
+- Chain ID: 31337
+- Import test accounts from Hardhat (Account #1 recommended as minter if you grant the role)
+
+## 🧭 App pages
+- `/` or `/mint`: Mint Certificate (minter/admin only)
+- `/verify`: Verify by token id; generate/verify signed QR
+- `/admin`: Upload metadata to IPFS; mint via backend endpoint
+
+## 🔑 Roles
+- CertificateNFT has `DEFAULT_ADMIN_ROLE` and `MINTER_ROLE`
+- To grant a minter after deploy:
+```powershell
+npx hardhat run scripts/grant-minter-role.js --network localhost --contract=<CertificateNFT address>
 ```
-VITE_CONTRACT_ADDRESS=0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
-```
 
-Create `backend/.env` (optional):
-```
-UNIVERSITY_PRIVATE_KEY=0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
-CERT_CONTRACT_ADDRESS=0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
-VERIFICATION_CONTRACT_ADDRESS=0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9
-```
-
-## 📱 Usage
-
-### Minting Certificates
-1. Go to `http://localhost:5173/mint`
-2. Connect MetaMask (use minter account)
-3. Enter recipient address
-4. Click "Mint Certificate"
-
-### Verifying Certificates
-1. Go to `http://localhost:5173/verify`
-2. Enter token ID
-3. Click "Verify" for blockchain check
-4. Click "Generate Signed QR" for cryptographic QR
-5. Click "Verify QR Signature" to validate QR
-
-### QR Code Features
-- **Blockchain Verification**: Direct contract call
-- **Signed QR**: Cryptographically signed by university
-- **Offline Verification**: QR codes work without blockchain access
-- **Tamper Proof**: Signatures prevent QR code forgery
-
-## 🔐 Security
-
-### Access Control
-- **Admin Role**: Deploy account, can grant/revoke roles
-- **Minter Role**: Universities, can mint certificates
-- **Public**: Anyone can verify certificates
-
-### QR Signing
-- Uses ECDSA signatures with secp256k1
-- University private key signs certificate data
-- Signature verification prevents tampering
-- Timestamps prevent replay attacks
+## 🔌 Backend API (localhost)
+- `POST /api/issue` { to } → mint certificate via backend wallet
+- `GET /api/verify/:tokenId` → on-chain validity
+- `POST /api/qr/generate` { tokenId, metadata } → signed QR
+- `POST /api/qr/verify` { qrData } → verify signature + current on-chain state
+- `POST /api/upload` { json } → IPFS add
 
 ## 🧪 Testing
-
-### Test Accounts (Hardhat)
+```powershell
+npx hardhat test
 ```
-Account #0: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 (Admin)
-Private Key: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+- Tests updated for current `CertificateNFT` methods (`mintCertificate`, `revokeCertificate`, `MINTER_ROLE`).
 
-Account #1: 0x70997970C51812dc3A010C7d01b50e0d17dc79C8 (Minter)
-Private Key: 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+## 🧱 Contracts & ABI
+- Solidity 0.8.20; OpenZeppelin 4.9
+- `CertificateNFT.sol` exports functions used by the frontend ABI at `frontend/src/abis/CertificateABI.json`:
 ```
-
-### Test Flow
-1. Import Account #1 to MetaMask
-2. Mint certificate to any address
-3. Verify certificate by token ID
-4. Generate signed QR code
-5. Verify QR signature
-
-## 🛠️ Development
-
-### Smart Contract Changes
-```bash
-# After modifying contracts
-npx hardhat compile
-npx hardhat run scripts/deploy.js --network localhost
-# Update contract addresses in frontend/.env and backend/.env
+[
+  "function mintCertificate(address recipient) public",
+  "function revokeCertificate(uint256 tokenId) public",
+  "function isValid(uint256 tokenId) public view returns (bool)",
+  "function grantMinterRole(address account) public",
+  "function revokeMinterRole(address account) public",
+  "function hasRole(bytes32 role, address account) public view returns (bool)",
+  "function ownerOf(uint256 tokenId) public view returns (address)",
+  "function MINTER_ROLE() public view returns (bytes32)",
+  "function DEFAULT_ADMIN_ROLE() public view returns (bytes32)"
+]
 ```
 
+## ⚙️ Configuration & tooling
+- Frontend (Vite): `vite.config.js` proxies `/api` → `http://localhost:4000`
+- Backend (ESM): `type: module` with modern imports
+- Ethers v5 across contracts, frontend, backend
+
+## 🧯 Troubleshooting
+- White/blank screen:
+  - Ensure `frontend/.env` has a correct `VITE_CONTRACT_ADDRESS` from the latest deploy
+  - Check browser dev console for missing env/contract errors
+  - Hard-refresh to reload styles and env
+- Port in use (Windows):
+  - Find and kill process using the port
+    ```powershell
+    netstat -ano | findstr :4000
+    Stop-Process -Id <PID> -Force
+    ```
+- PowerShell command separators:
+  - Use `;` instead of `&&` for chaining commands
+- IPFS upload:
+  - Run a local IPFS daemon or set `IPFS_URL` to a remote provider
+
+## 🔐 Security
+- Never commit private keys or production secrets
+- Use proper env management for non-local deployments
+- Use HTTPS and add backend rate limiting for production
+
+<<<<<<< HEAD
 ### Adding New Minters
 ```bash
 # Edit scripts/grant-minter-role.js with new address
@@ -216,5 +209,16 @@ npx hardhat run scripts/grant-minter-role.js --network localhost
 ## 📄 License
 
 NPR License - see LICENSE file for details.
+=======
+## 🌐 Deploying to testnet/mainnet
+1. Add network settings to `hardhat.config.js`
+2. Set `ALCHEMY_API_URL` and `PRIVATE_KEY` in environment
+3. Deploy: `npx hardhat run scripts/deploy.js --network <network>`
+4. Update `frontend/.env` and `backend/.env` with deployed addresses
+>>>>>>> d355214 (Your descriptive commit message here)
 
 
+<<<<<<< HEAD
+=======
+Made with Hardhat, React, and Express ESM. UI designed for clarity and speed. 🚀
+>>>>>>> d355214 (Your descriptive commit message here)
