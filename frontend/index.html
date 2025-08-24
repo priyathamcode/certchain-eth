@@ -1,21 +1,65 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>CertChain — Certificates DApp</title>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- SEO Meta Tags -->
+    <title>CertChain - Blockchain Certificate Management</title>
+    <meta name="description" content="Secure, decentralized certificate management system built on blockchain technology. Mint, verify, and manage digital certificates with transparency and immutability." />
+    <meta name="keywords" content="blockchain, certificates, NFT, ethereum, verification, digital credentials" />
+    <meta name="author" content="CertChain Team" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://certchain.app/" />
+    <meta property="og:title" content="CertChain - Blockchain Certificate Management" />
+    <meta property="og:description" content="Secure, decentralized certificate management system built on blockchain technology." />
+    <meta property="og:image" content="/og-image.png" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://certchain.app/" />
+    <meta property="twitter:title" content="CertChain - Blockchain Certificate Management" />
+    <meta property="twitter:description" content="Secure, decentralized certificate management system built on blockchain technology." />
+    <meta property="twitter:image" content="/og-image.png" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#6366f1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="CertChain" />
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "CertChain",
+      "description": "Blockchain-based certificate management system",
+      "url": "https://certchain.app",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
   </head>
   <body>
-    <div class="navbar">
-      <div class="navbar-inner">
-        <div class="brand"><div class="logo"></div> CertChain</div>
-        <div class="nav-links">
-          <!-- Links are rendered by React Router -->
-        </div>
-      </div>
-    </div>
-    <div id="root" class="container"></div>
-    <footer class="footer small">© CertChain — Demo DApp</footer>
-    <script type="module" src="/src/index.jsx"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
